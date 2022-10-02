@@ -2,16 +2,16 @@ import state, utils, click
 
 def player_input():
     print(
-        "Press w:(up), a:(left), s:(down), d:(right)"
+        "Press w:(up), a:(left), s:(down), d:(right), u(undo)"
         "\nPress b to go back to menu"
     )
     action = None
-    while action not in ["w", "a", "s", "d", "b"]:
+    while action not in ["w", "a", "s", "d", "b", "u"]:
         action = click.getchar().lower()
     return action
 
 def move(game_state, delta):
-    player_pos, player = state.get_player(game_state)
+    player_pos = state.get_player(game_state)
     new_pos = next_pos(player_pos, delta)
     if state.is_at(game_state, new_pos, state.box()):
             next_box_pos = next_pos(new_pos, delta)
@@ -19,6 +19,9 @@ def move(game_state, delta):
                 state.move_box(game_state, new_pos, next_box_pos)
     if state.player_can_move(game_state, new_pos):
         state.move_player(game_state, player_pos, new_pos)
+
+def undo(game_state):
+    state.undo(game_state)
 
 def next_pos(pos, delta):
     px, py = pos
@@ -53,7 +56,10 @@ def run(game_state):
         action = player_input()
         if action == "b":
             return 
-        move(game_state, DELTA[action]) 
+        elif action == "u":
+            undo(game_state)
+        else:
+            move(game_state, DELTA[action]) 
         display(game_state)
 
 if __name__ == "__main__":

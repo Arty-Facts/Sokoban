@@ -4,7 +4,7 @@ import state_builder as sb
 
 
 def create_level():
-    return {}
+    return {"history":[]}
 
 def can_move(state, pos, item):
     level = state["active_level"]
@@ -16,13 +16,36 @@ def player_can_move(state, pos):
 def box_can_move(state, pos):
     return can_move(state, pos, sb.box())
 
+def move(level, src, dest, item):
+    history = []
+    if sb.remove(level, src, item):
+        history.append(lambda: sb.add(level, src, item))
+    else:
+        return False
+
+    if sb.add(level, dest, item):
+        history.append(lambda: sb.remove(level, dest, item))
+    else:
+        history[0]()
+        return False
+    level["history"].append(history)
+    return True
+
+def undo(state):
+    level = state["active_level"]
+    history = level["history"]
+    if len(history) != 0:
+        actions = history.pop(-1)
+        for a in actions:
+            a()
+
 def move_player(state, src, dest):
     level = state["active_level"]
-    return sb.remove_player(level, src) and sb.add_player(level, dest)
+    return move(level, src, dest, sb.player())
 
 def move_box(state, src, dest):
     level = state["active_level"]
-    return sb.remove_box(level, src) and sb.add_box(level, dest)
+    return move(level, src, dest, sb.box())
 
 def box():
     return sb.box()
@@ -38,9 +61,9 @@ def get_tile(state, pos):
 def get_player(state):
     if state["active_level"] == None:
         return None
-    for pos in state["active_level"]:
+    for pos in filter(lambda x:x != "history" ,state["active_level"]):
         if sb.at(state["active_level"], pos, sb.player()):
-            return pos, sb.player()
+            return pos
 
 def is_at(state, pos, id):
     if state["active_level"] == None:

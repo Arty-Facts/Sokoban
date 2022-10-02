@@ -70,13 +70,13 @@ def is_at(state, pos, id):
         return False
     return sb.at(state["active_level"], pos, id)
     
-def to_str(level):
+def to_str(level, id_to_str=sb.ID_TO_STR):
     if level == None:
         return ""
     res = []
     for x in range(level["x"]):
         for y in range(level["y"]):
-            res.append(sb.ID_TO_STR[get(level, (x,y))])
+            res.append(id_to_str[get(level, (x,y))])
         res.append("\n")
     res.append("\n")
     return "".join(res)
@@ -84,6 +84,9 @@ def to_str(level):
 
 def active_game_to_str(state):
     return to_str(state["active_level"])
+
+def active_game_to_dstr(state):
+    return to_str(state["active_level"], sb.ID_TO_DSTR)
 
 def level_to_str(state, lvl):
     if lvl != None:
@@ -103,7 +106,7 @@ def parse_level(level_data):
     level = create_level()
     max_x = 0
     max_y = 0
-    for x, line in enumerate(level_data.split("\n")):
+    for x, line in enumerate(level_data.rstrip().split("\n")):
         max_x = max(max_x, x)
         for y, item in enumerate(line):
             max_y = max(max_y, y)

@@ -25,6 +25,18 @@ ID_TO_STR = {
             ID["storage"])  : GREEN+"+"+ENDC,
 }
 
+ID_TO_DSTR = {
+    ID["floor"]             : " ",
+    ID["wall"]              : "#",
+    ID["box"]               : "o",
+    ID["player"]            : "@",
+    ID["storage"]           : ".",
+    combine(ID["box"], 
+            ID["storage"])  : "*",
+    combine(ID["player"], 
+            ID["storage"])  : "+",
+}
+
 VALID = [
     ID["floor"],
     ID["wall"],
